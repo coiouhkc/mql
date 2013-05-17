@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<project name="mql" default="dist" basedir=".">
+  <description>
+		My Query Language, query language to evaluate complex conditions on Map-type record collections.
+	</description>
+  <!-- set global properties for this build -->
+  <property name="src" location="src"/>
+  <property name="test" location="test"/>
+  <property name="doc" location="doc"/>
+  <property name="build" location="build"/>
+  <property name="classes" location="${build}/classes"/>
+  <property name="test-classes" location="${build}/test-classes"/>
+  <property name="lib" location="lib"/>
+  <property name="junit.jar" value="${lib}/junit.jar"/>
+  <property name="hamcrest-core-1.1.jar" value="${lib}/hamcrest-core-1.1.jar"/>
+  
+  <path id="compile.classpath">
+    <pathelement location="${junit.jar}"/>
+    <pathelement location="${hamcrest-core-1.1.jar}"/>
+  </path>
+
+  <target name="init">
+    <mkdir dir="${build}"/>
+    <mkdir dir="${classes}"/>
+    <mkdir dir="${test-classes}"/>
+    <mkdir dir="${build}/javadoc"/>
+  </target>
+  
+  <target name="compile" depends="init" >
+    <javac srcdir="${src}" destdir="${classes}" includeantruntime="false"/>
+  </target>
+  
+  <target name="test" depends="dist">
+    <javac srcdir="${test}" destdir="${test-classes}">
+      <classpath refid="compile.classpath"/>
+      <classpath>
+        <pathelement location="${build}/mql.jar"/>
+      </classpath>
+    </javac>
+    <junit fork="yes" printsummary="on">
+      <classpath refid="compile.classpath"/>
+      <classpath>
+        <pathelement location="${test-classes}"/>
+        <pathelement location="${build}/mql.jar"/>
+      </classpath>
+      <formatter type="xml" extension=".xml"/>
+      <batchtest toDir="${build}">
+        <fileset dir="${test-classes}">
+          <include name="**/*Test.class"/>
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+  
+  <target name="doc-java">
+    <javadoc sourcepath="${src}" destdir="${build}/javadoc">
+		</javadoc>
+  </target>
+  
+  <target name="doc" depends="doc-java">
+	</target>
+  <target name="dist" depends="doc,compile">
+    <jar jarfile="${build}/mql.jar" basedir="${classes}">
+		</jar>
+  </target>
+  
+  <target name="clean" description="clean up">
+    <delete dir="${build}"/>
+  </target>
+</project>
